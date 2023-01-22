@@ -1,9 +1,17 @@
 import { Chat } from "./Chat";
 import { User } from "./User";
 
-export interface NewMessageRequest {
-    update_id: number;
+export interface CallbackQuery {
+    id: string;
+    from: User;
     message: Message;
+    data: string;
+}
+
+export interface NewMessageRequest {
+    update_id?: number;
+    message?: Message;
+    callback_query?: CallbackQuery;
 }
 
 export interface MessageEntity {

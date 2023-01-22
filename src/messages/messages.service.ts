@@ -1,76 +1,39 @@
-import {
-    DeleteMessageResponse,
-    SendMessageResponse,
-} from "./../Types/SendMessageResponse";
-import { prepareLinks } from "./utils";
-import { Message } from "./../Types/Message";
-import axios from "axios";
-import { apiToken, baseApiUrl } from "../api-connection";
-import CheckByLinkSource from "./CheckByLinkSource";
+import { CallbackQuery, NewMessageRequest } from "./../Types/Message";
+import DialogWithUser from "../DialogWithUser";
+import LinksArrayManager from "../downloader/LinksArrayManager";
 import YoutubeDownloader from "../downloader/youtube";
+import FilterMessage from "./FilterMessage";
 
 class MessagesService {
-    public async receiveMessage(receivedMessage: Message): Promise<void> {
-        const chatId = receivedMessage.chat.id;
-        const sendMessageResponse = await this.sendMessageToUser(
+    public async receiveMessage(request: NewMessageRequest): Promise<void> {
+        if (!request.message) {
+            this.receiveCallback(request.callback_query);
+            return;
+        }
+        const chatId = request.message.chat.id;
+        const sendMessageResponse = await DialogWithUser.sendMessageToUser(
             chatId,
             "Processing source link..."
         );
-        const sourceLinks: string[] = prepareLinks(receivedMessage.text);
-
-        sourceLinks.forEach(async (singleLink) => {
-            if (CheckByLinkSource.checkIsLinkYoutube(singleLink)) {
-                console.log("downloading video from youtube...");
-                const downloader = new YoutubeDownloader(singleLink, chatId);
-                await downloader.downloadVideoByLink();
-                this.deleteMessage(
-                    chatId,
-                    sendMessageResponse.result.message_id
-                );
-            } else if (CheckByLinkSource.checkIsLinkInstagram(singleLink)) {
-                // todo: add instagram support
-            } else {
-                console.log("user provided an invalid link");
-                // todo: add contact form for users feedback
-                this.sendMessageToUser(
-                    chatId,
-                    `Resource ${singleLink} is not supported yet.
-                    Please contact me if you need it (contact form will be available soon)`
-                );
-            }
-        });
+        if (process.env.MY_CHAT_ID) {
+            DialogWithUser.sendMessageToUser(
+                Number(process.env.MY_CHAT_ID),
+                `[${request.message.chat.username}]: ${request.message.text}`
+            );
+        }
+        const linksArray: string[] = FilterMessage.prepareLinks(request.message.text);
+        LinksArrayManager.manageLinksArray(
+            linksArray,
+            chatId,
+            sendMessageResponse.result.message_id
+        );
     }
 
-    private async sendMessageToUser(
-        chatId: number,
-        body: string
-    ): Promise<SendMessageResponse> {
-        const newMessage = {
-            chat_id: chatId,
-            text: body,
-        };
-        return await axios
-            .post<SendMessageResponse>(
-                `${baseApiUrl}${apiToken}/sendMessage`,
-                newMessage
-            )
-            .then((response) => response.data);
-    }
-
-    private async deleteMessage(
-        chatId: number,
-        messageId: number
-    ): Promise<DeleteMessageResponse> {
-        const deleteMessageParameter = {
-            chat_id: chatId,
-            message_id: messageId,
-        };
-        return await axios
-            .post<DeleteMessageResponse>(
-                `${baseApiUrl}${apiToken}/deleteMessage`,
-                deleteMessageParameter
-            )
-            .then((response) => response.data);
+    private async receiveCallback(callbackMessage: CallbackQuery | undefined): Promise<void> {
+        if (!callbackMessage || !callbackMessage.data) return;
+        const [itag, sourceLink] = callbackMessage.data.split(" ");
+        const downloader = new YoutubeDownloader(sourceLink, callbackMessage.message.chat.id);
+        downloader.downloadVideoByLink(Number(itag), Number(callbackMessage.message.message_id));
     }
 }
 
