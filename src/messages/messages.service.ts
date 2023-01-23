@@ -18,7 +18,9 @@ class MessagesService {
         if (process.env.MY_CHAT_ID) {
             DialogWithUser.sendMessageToUser(
                 Number(process.env.MY_CHAT_ID),
-                `[${request.message.chat.username}]: ${request.message.text}`
+                `[${request.message.chat.username || request.message.chat.first_name}]: ${
+                    request.message.text
+                }`
             );
         }
         const linksArray: string[] = FilterMessage.prepareLinks(request.message.text);

@@ -1,9 +1,9 @@
-import { QualitySelect } from "./../messages/QualitySelect";
-import { SendMessageResponse } from "./../Types/SendMessageResponse";
 import fs from "fs";
 import ytdl from "ytdl-core";
-import { MessageBody, createTitleAndFileName } from "../messages/utils";
 import DialogWithUser, { EditMessageBody } from "../DialogWithUser";
+import { MessageBody, createTitleAndFileName } from "../messages/utils";
+import { SendMessageResponse } from "./../Types/SendMessageResponse";
+import { QualitySelect } from "./../messages/QualitySelect";
 
 class YoutubeDownloader {
     sourceLink: string;
@@ -32,6 +32,9 @@ class YoutubeDownloader {
         messageId: number
     ): Promise<SendMessageResponse> {
         try {
+            const messageWithLoadingState = this.createMessageWithLoadingState(messageId);
+
+            DialogWithUser.editMessageCaption(messageWithLoadingState);
             const newMessageWithLink = await this.startDownload(itag);
             const editMessageBody: EditMessageBody = {
                 chatId: this.chatId,
@@ -63,6 +66,17 @@ class YoutubeDownloader {
                     reject(error);
                 });
         });
+    }
+
+    private createMessageWithLoadingState(messageId: number): EditMessageBody {
+        return {
+            chatId: this.chatId,
+            messageId,
+            replyMarkup: {
+                resize_keyboard: true,
+                inline_keyboard: [[{ text: "Downloading video...", callback_data: "downloading" }]],
+            },
+        };
     }
 }
 

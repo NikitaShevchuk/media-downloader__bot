@@ -1,8 +1,8 @@
-import { FormatButton } from "./../messages/Types/index";
 import axios from "axios";
-import { SendMessageResponse, DeleteMessageResponse } from "../Types/SendMessageResponse";
-import { baseApiUrl, apiToken } from "../api-connection";
+import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
+import { apiToken, baseApiUrl } from "../api-connection";
 import { MessageBodyWithPhoto } from "../messages/Types";
+import { FormatButton } from "./../messages/Types/index";
 
 export interface NewMessage {
     chat_id: number;
@@ -10,23 +10,28 @@ export interface NewMessage {
     disable_web_page_preview?: boolean;
 }
 
+interface ReplyMarkup {
+    resize_keyboard: boolean;
+    inline_keyboard: [FormatButton][] | [{}][];
+}
+
 export interface EditMessageBody {
     chatId: number;
     messageId: number;
-    caption: string;
-    replyMarkup?: [FormatButton][] | [{}][];
+    caption?: string;
+    replyMarkup?: ReplyMarkup;
     photo?: string;
 }
 
 export interface EditMessageRequestBody {
     chat_id: number;
     message_id: number;
-    caption: string;
-    reply_markup?: [FormatButton][] | [{}][];
+    caption?: string;
+    reply_markup?: ReplyMarkup;
     photo?: string;
 }
 
-const defaultInstance = axios.create({ baseURL: `${baseApiUrl}${apiToken}` });
+export const axiosInstance = axios.create({ baseURL: `${baseApiUrl}${apiToken}` });
 
 class DialogWithUser {
     public async sendMessageToUser(
@@ -39,7 +44,7 @@ class DialogWithUser {
             text: body,
         };
         if (removeLinkPreview) newMessage.disable_web_page_preview = removeLinkPreview;
-        return await defaultInstance
+        return await axiosInstance
             .post<SendMessageResponse>(`/sendMessage`, newMessage)
             .then((response) => response.data);
     }
@@ -58,7 +63,7 @@ class DialogWithUser {
         if (editMessageBody.replyMarkup) {
             editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
         }
-        return await defaultInstance
+        return await axiosInstance
             .post(`/editMessageCaption`, editMessageRequestBody)
             .then((response) => response.data);
     }
@@ -68,7 +73,7 @@ class DialogWithUser {
             chat_id: chatId,
             text: "Something went wrong :(",
         };
-        return await defaultInstance
+        return await axiosInstance
             .post<SendMessageResponse>(`/sendMessage`, newMessage)
             .then((response) => response.data);
     }
@@ -82,7 +87,7 @@ class DialogWithUser {
             photo: body.photo,
             caption: body.caption,
         };
-        return await defaultInstance
+        return await axiosInstance
             .post<SendMessageResponse>(`/sendPhoto`, newMessage)
             .then((response) => response.data);
     }
@@ -98,7 +103,7 @@ class DialogWithUser {
             resize_keyboard: true,
             reply_markup: { inline_keyboard: body.formatButtons },
         };
-        return await defaultInstance
+        return await axiosInstance
             .post<SendMessageResponse>(`/sendPhoto`, newMessage)
             .then((response) => response.data);
     }
@@ -108,7 +113,7 @@ class DialogWithUser {
             chat_id: chatId,
             message_id: messageId,
         };
-        return await defaultInstance
+        return await axiosInstance
             .post<DeleteMessageResponse>(`/deleteMessage`, deleteMessageParameter)
             .then((response) => response.data);
     }
