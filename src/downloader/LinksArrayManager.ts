@@ -18,7 +18,6 @@ class LinksArrayManager {
                 await downloader.download();
                 await downloader.sendLinkToUser();
             } else {
-                // TODO: add contact form for users feedback
                 DialogWithUser.deleteMessage(chatId, notificationMessageId);
                 DialogWithUser.sendMessageToUser(
                     chatId,
