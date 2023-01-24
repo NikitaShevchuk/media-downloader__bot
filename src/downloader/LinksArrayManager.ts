@@ -1,5 +1,6 @@
 import DialogWithUser from "../DialogWithUser";
-import CheckByLinkSource from "../messages/CheckByLinkSource";
+import CheckByLinkSource from "./CheckByLinkSource";
+import { InstagramDownloader } from "./instagram";
 import YoutubeDownloader from "./youtube";
 
 class LinksArrayManager {
@@ -9,9 +10,15 @@ class LinksArrayManager {
                 const downloader = new YoutubeDownloader(singleLink, chatId);
                 await downloader.sendVideoInfoToUser(notificationMessageId);
             } else if (CheckByLinkSource.checkIsLinkInstagram(singleLink)) {
-                // todo: add instagram support
+                const downloader = new InstagramDownloader(
+                    chatId,
+                    singleLink,
+                    notificationMessageId
+                );
+                await downloader.download();
+                await downloader.sendLinkToUser();
             } else {
-                // todo: add contact form for users feedback
+                // TODO: add contact form for users feedback
                 DialogWithUser.deleteMessage(chatId, notificationMessageId);
                 DialogWithUser.sendMessageToUser(
                     chatId,

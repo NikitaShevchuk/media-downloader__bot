@@ -1,7 +1,7 @@
 import ytdl from "ytdl-core";
-import DialogWithUser from "../DialogWithUser";
-import { SendMessageResponse } from "../Types/SendMessageResponse";
-import { MessageBodyWithPhoto, FormatButton } from "./Types";
+import DialogWithUser from "../../DialogWithUser";
+import { SendMessageResponse } from "../../Types/SendMessageResponse";
+import { FormatButton, MessageBodyWithPhoto } from "../../messages/Types";
 
 export class QualitySelect {
     videoInfo: ytdl.videoInfo;

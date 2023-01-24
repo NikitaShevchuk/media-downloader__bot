@@ -11,5 +11,5 @@ export interface FormatButton {
 export interface MessageBodyWithPhoto {
     photo: string;
     caption: string;
-    formatButtons: Array<[FormatButton]>;
+    formatButtons?: Array<[FormatButton]>;
 }

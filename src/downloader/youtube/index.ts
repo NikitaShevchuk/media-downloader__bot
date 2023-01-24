@@ -1,13 +1,13 @@
 import fs from "fs";
 import ytdl from "ytdl-core";
-import DialogWithUser, { EditMessageBody } from "../DialogWithUser";
-import { MessageBody, createTitleAndFileName } from "../messages/utils";
-import { SendMessageResponse } from "./../Types/SendMessageResponse";
-import { QualitySelect } from "./../messages/QualitySelect";
+import DialogWithUser, { EditMessageBody } from "../../DialogWithUser";
+import { SendMessageResponse } from "../../Types/SendMessageResponse";
+import { MessageBody, createTitleAndFileName } from "../../messages/utils";
+import { QualitySelect } from "./QualitySelect";
 
 class YoutubeDownloader {
-    sourceLink: string;
-    chatId: number;
+    private sourceLink: string;
+    private chatId: number;
 
     constructor(sourceLink: string, chatId: number) {
         this.sourceLink = sourceLink;
