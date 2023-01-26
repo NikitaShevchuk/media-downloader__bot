@@ -53,16 +53,15 @@ export class GetFolderTotalSize {
     }
 
     private getTotalSize(directoryPath: string): string {
-        const isDownloadsDirectoryExist = fs.existsSync(
-            __dirname.replace("dist\\src\\tools", directoryPath)
-        );
+        const directoryToCheck = __dirname.replace("dist\\src\\tools", directoryPath);
+        const isDownloadsDirectoryExist = fs.existsSync(directoryToCheck);
         if (!isDownloadsDirectoryExist) {
-            return "0 KB";
+            fs.mkdirSync(directoryToCheck);
         }
         const arrayOfFiles = this.getAllFiles(directoryPath);
 
         let totalSize = 0;
-
+        if (arrayOfFiles.length < 1) return "1 KB";
         arrayOfFiles.forEach(function (filePath) {
             totalSize += fs.statSync(filePath).size;
         });
