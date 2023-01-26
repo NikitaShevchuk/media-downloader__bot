@@ -53,6 +53,12 @@ export class GetFolderTotalSize {
     }
 
     private getTotalSize(directoryPath: string): string {
+        const isDownloadsDirectoryExist = fs.existsSync(
+            __dirname.replace("dist\\src\\tools", directoryPath)
+        );
+        if (!isDownloadsDirectoryExist) {
+            return "0 KB";
+        }
         const arrayOfFiles = this.getAllFiles(directoryPath);
 
         let totalSize = 0;
