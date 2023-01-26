@@ -57,7 +57,6 @@ export class GetFolderTotalSize {
     private getTotalSize(directoryPath: string): string {
         const directoryToCheck = __dirname.replace(fullPathToFolder, directoryPath);
         const isDownloadsDirectoryExist = fs.existsSync(directoryToCheck);
-        console.log(`[server]: directory exist: ${directoryToCheck}`);
         if (!isDownloadsDirectoryExist) {
             fs.mkdirSync(directoryToCheck);
         }

@@ -1,6 +1,6 @@
 import fs from "fs";
 import ytdl from "ytdl-core";
-import { EditMessageBody } from "../../DialogWithUser";
+import DialogWithUser, { EditMessageBody } from "../../DialogWithUser";
 import { MessageBody, createTitleAndFileName } from "../../messages/utils";
 import { GetFolderTotalSize, SizesEnum } from "../../tools/GetFolderTotalSize";
 
@@ -49,6 +49,12 @@ export class Tools {
 
     public checkAvailableStorage(): boolean {
         const folderSize = new GetFolderTotalSize("./downloads");
+        if (process.env.MY_CHAT_ID) {
+            DialogWithUser.sendMessageToUser(
+                Number(process.env.MY_CHAT_ID),
+                `[server storage]: ${folderSize.total}`
+            );
+        }
         console.log(`[server]: Total server space used: ${folderSize.total}`);
         if (folderSize.total.includes(SizesEnum.TB)) return false;
         if (folderSize.total.includes(SizesEnum.GB)) return false;
