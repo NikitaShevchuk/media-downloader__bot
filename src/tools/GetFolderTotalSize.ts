@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+const fullPathToFolder = process.env.PATH_TO_TOOLS_FOLDER || "dist/src/tools";
+
 export const SizesEnum = {
     Bytes: "Bytes",
     KB: "KB",
@@ -31,7 +33,7 @@ export class GetFolderTotalSize {
             if (fs.statSync(dirPath + "/" + file).isDirectory()) {
                 arrayOfFiles = this.getAllFiles(dirPath + "/" + file, arrayOfFiles);
             } else {
-                arrayOfFiles.push(path.join(__dirname.replace("dist\\src\\tools", dirPath), file));
+                arrayOfFiles.push(path.join(__dirname.replace(fullPathToFolder, dirPath), file));
             }
         });
 
@@ -53,7 +55,7 @@ export class GetFolderTotalSize {
     }
 
     private getTotalSize(directoryPath: string): string {
-        const directoryToCheck = __dirname.replace("dist\\src\\tools", directoryPath);
+        const directoryToCheck = __dirname.replace(fullPathToFolder, directoryPath);
         const isDownloadsDirectoryExist = fs.existsSync(directoryToCheck);
         console.log(`[server]: directory exist: ${directoryToCheck}`);
         if (!isDownloadsDirectoryExist) {
