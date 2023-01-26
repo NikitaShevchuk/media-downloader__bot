@@ -1,7 +1,11 @@
 import axios from "axios";
 import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
 import { apiToken, baseApiUrl } from "../api-connection";
-import { MessageBodyWithPhoto } from "../messages/Types";
+import {
+    MessageBodyWithPhoto,
+    MessageBodyWithVideo,
+    MessageRequestBodyWithVideo,
+} from "../messages/Types";
 import { FormatButton } from "./../messages/Types/index";
 
 export interface NewMessage {
@@ -89,6 +93,20 @@ class DialogWithUser {
         };
         return await axiosInstance
             .post<SendMessageResponse>(`/sendPhoto`, newMessage)
+            .then((response) => response.data);
+    }
+
+    public async sendVideoToUser(
+        chatId: number,
+        body: MessageBodyWithVideo
+    ): Promise<SendMessageResponse> {
+        const newMessage: MessageRequestBodyWithVideo = {
+            chat_id: chatId,
+            video: body.video,
+        };
+        if (body.caption) newMessage.caption = body.caption;
+        return await axiosInstance
+            .post<SendMessageResponse>(`/sendVideo`, newMessage)
             .then((response) => response.data);
     }
 

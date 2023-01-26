@@ -13,3 +13,14 @@ export interface MessageBodyWithPhoto {
     caption: string;
     formatButtons?: Array<[FormatButton]>;
 }
+
+export interface MessageBodyWithVideo {
+    caption?: string;
+    video: string;
+}
+
+export interface MessageRequestBodyWithVideo {
+    chat_id: number;
+    caption?: string;
+    video: string;
+}

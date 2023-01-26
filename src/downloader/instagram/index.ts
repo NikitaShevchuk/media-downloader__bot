@@ -1,20 +1,10 @@
 import axios from "axios";
 import DialogWithUser from "../../DialogWithUser";
-import { MessageBodyWithPhoto } from "../../messages/Types";
-
-interface Video {
-    url: string;
-    poster: string;
-}
-
-interface OwnerInfo {
-    username: string;
-    profile_pic_url: string;
-}
+import { MessageBodyWithVideo } from "../../messages/Types";
 
 interface InstagramVideoResponse {
-    media: [Video];
-    owner_info: OwnerInfo;
+    meta: { title: string };
+    url: [{ url: string }];
 }
 
 export class InstagramDownloader {
@@ -22,8 +12,7 @@ export class InstagramDownloader {
     private chatId: number;
     private notificationMessageId: number;
     public videoLink?: string;
-    public thumbnailLink?: string;
-    public author?: string;
+    public title?: string;
 
     constructor(chatId: number, sourceLink: string, notificationMessageId: number) {
         this.chatId = chatId;
@@ -32,31 +21,37 @@ export class InstagramDownloader {
     }
 
     public async download() {
+        const body = { url: this.sourceLink };
         try {
-            const apiResponse = await axios.get<InstagramVideoResponse>(
-                `https://api2.reelsdownloader.io/allinone`,
-                {
-                    headers: {
-                        url: this.sourceLink,
-                    },
-                }
+            const apiResponse = await axios.post<InstagramVideoResponse>(
+                `https://ssyoutube.com/api/convert`,
+                body
             );
-            this.videoLink = apiResponse.data.media[0].url;
-            this.thumbnailLink = apiResponse.data.media[0].poster;
-            this.author = apiResponse.data.owner_info.username;
+
+            this.videoLink = apiResponse.data.url[0].url;
+            this.title = apiResponse.data?.meta.title;
         } catch (error: any) {
+            console.log(error);
             this.videoLink = "Link not found";
         }
     }
 
     public async sendLinkToUser() {
         DialogWithUser.deleteMessage(this.chatId, this.notificationMessageId);
-        if (!this.videoLink) return;
+        if (!this.videoLink) {
+            DialogWithUser.sendMessageToUser(this.chatId, "Video link not found");
+            return;
+        }
 
-        const messageBody: MessageBodyWithPhoto = {
-            photo: this.thumbnailLink || "",
-            caption: `Video by: ${this.author}\n\nDownload video via this link: ${this.videoLink}`,
+        const messageBody: MessageBodyWithVideo = {
+            video: this.videoLink,
+            caption: `${this.title || ""}`,
         };
-        DialogWithUser.sendPhotoToUser(this.chatId, messageBody);
+        try {
+            DialogWithUser.sendVideoToUser(this.chatId, messageBody);
+        } catch (error: any) {
+            console.log(error);
+            DialogWithUser.sendErrorMessageToUser(this.chatId);
+        }
     }
 }

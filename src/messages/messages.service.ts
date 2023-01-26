@@ -1,6 +1,6 @@
 import DialogWithUser from "../DialogWithUser";
 import LinksArrayManager from "../downloader/LinksArrayManager";
-import YoutubeDownloader from "../downloader/youtube";
+import YoutubeDownloader from "../downloader/youtube/YoutubeDownloader";
 import { CallbackQuery, NewMessageRequest } from "./../Types/Message";
 import FilterMessage from "./FilterMessage";
 
