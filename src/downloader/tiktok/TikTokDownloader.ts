@@ -15,10 +15,13 @@ export class TikTokDownloader {
 
     public async download() {
         try {
-            const data = { id: this.sourceLink };
-            const response = await axios.post(`https://ttsave.app/download`, data);
+            // const data = { id: this.sourceLink };
+            const response = await axios.get(
+                `https://dlpanda.com/en?url=${encodeURIComponent(this.sourceLink || "")}`
+            );
             const selector = Cheerio.load(response.data);
-            const videoUrl = selector("a[type=no-watermark]").attr("href");
+            // const videoUrl = selector("a[type=no-watermark]").attr("href");
+            const videoUrl = selector("source").attr("src");
             const messageBody: MessageBodyWithVideo = {
                 video: videoUrl || "",
                 caption: videoUrl,
