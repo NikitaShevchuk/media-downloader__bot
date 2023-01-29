@@ -20,7 +20,7 @@ export class TikTokDownloader {
             const response = await axios.post(
                 `https://api.tikmate.app/api/lookup`,
                 data,
-                getOptions()
+                getOptions(data.getHeaders())
             );
             const { token, id } = response.data;
             const videoUrl = `https://tikmate.app/download/${token}/${id}.mp4?hd=1`;
