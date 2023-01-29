@@ -2,6 +2,7 @@ import axios from "axios";
 import DialogWithUser from "../../DialogWithUser";
 import { MessageBodyWithVideo } from "../../messages/Types";
 import Cheerio from "cheerio";
+import { getOptions } from "./getOptions";
 
 export class TikTokDownloader {
     private sourceLink: string;
@@ -15,7 +16,7 @@ export class TikTokDownloader {
     public async download() {
         try {
             const data = { id: this.sourceLink };
-            const response = await axios.post(`https://ttsave.app/download`, data);
+            const response = await axios.post(`https://ttsave.app/download`, data, getOptions());
             const selector = Cheerio.load(response.data);
             const videoUrl = selector("a[type=no-watermark]").attr("href");
             console.log(videoUrl);
