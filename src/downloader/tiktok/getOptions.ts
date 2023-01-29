@@ -1,8 +1,5 @@
 export const getOptions = () => ({
     headers: {
-        ":scheme": "https",
-        ":authority": "ttsave.app",
-        ":path": "/download",
         Accept: "application/json, text/plain, /",
         "Content-Type": "application/json",
         Origin: "https://ttsave.app/",
