@@ -2,6 +2,7 @@ import axios from "axios";
 import FormData from "form-data";
 import DialogWithUser from "../../DialogWithUser";
 import { MessageBodyWithVideo } from "../../messages/Types";
+import { getOptions } from "./getOptions";
 
 export class TikTokDownloader {
     private sourceLink: string;
@@ -16,7 +17,11 @@ export class TikTokDownloader {
         try {
             const data = new FormData();
             data.append("url", this.sourceLink);
-            const response = await axios.post(`https://api.tikmate.app/api/lookup`, data);
+            const response = await axios.post(
+                `https://api.tikmate.app/api/lookup`,
+                data,
+                getOptions()
+            );
             const { token, id } = response.data;
             const videoUrl = `https://tikmate.app/download/${token}/${id}.mp4?hd=1`;
             const messageBody: MessageBodyWithVideo = {
