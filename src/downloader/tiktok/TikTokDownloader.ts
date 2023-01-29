@@ -15,12 +15,11 @@ export class TikTokDownloader {
 
     public async download() {
         try {
-            const data = new FormData();
-            data.append("url", this.sourceLink);
+            // const data = new FormData();
+            // data.append("url", this.sourceLink);
             const response = await axios.post(
                 `https://api.tikmate.app/api/lookup`,
-                data,
-                getOptions(data.getHeaders())
+                getOptions(this.sourceLink)
             );
             const { token, id } = response.data;
             const videoUrl = `https://tikmate.app/download/${token}/${id}.mp4?hd=1`;
