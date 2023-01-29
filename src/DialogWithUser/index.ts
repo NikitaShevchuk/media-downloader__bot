@@ -1,77 +1,16 @@
 import axios from "axios";
-import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
+import { SendMessageResponse } from "../Types/SendMessageResponse";
 import { apiToken, baseApiUrl } from "../api-connection";
 import {
     MessageBodyWithPhoto,
     MessageBodyWithVideo,
     MessageRequestBodyWithVideo,
 } from "../messages/Types";
-import { FormatButton } from "./../messages/Types/index";
-
-export interface NewMessage {
-    chat_id: number;
-    text: string;
-    disable_web_page_preview?: boolean;
-}
-
-interface ReplyMarkup {
-    resize_keyboard: boolean;
-    inline_keyboard: [FormatButton][] | [{}][];
-}
-
-export interface EditMessageBody {
-    chatId: number;
-    messageId: number;
-    caption?: string;
-    replyMarkup?: ReplyMarkup;
-    photo?: string;
-}
-
-export interface EditMessageRequestBody {
-    chat_id: number;
-    message_id: number;
-    caption?: string;
-    reply_markup?: ReplyMarkup;
-    photo?: string;
-}
+import { BasicMessageActions } from "./BasicMessageActions";
 
 export const axiosInstance = axios.create({ baseURL: `${baseApiUrl}${apiToken}` });
 
-class DialogWithUser {
-    public async sendMessageToUser(
-        chatId: number,
-        body: string,
-        removeLinkPreview?: boolean
-    ): Promise<SendMessageResponse> {
-        const newMessage: NewMessage = {
-            chat_id: chatId,
-            text: body,
-        };
-        if (removeLinkPreview) newMessage.disable_web_page_preview = removeLinkPreview;
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendMessage`, newMessage)
-            .then((response) => response.data);
-    }
-
-    public async editMessageCaption(
-        editMessageBody: EditMessageBody
-    ): Promise<SendMessageResponse> {
-        const editMessageRequestBody: EditMessageRequestBody = {
-            chat_id: editMessageBody.chatId,
-            message_id: editMessageBody.messageId,
-            caption: editMessageBody.caption,
-        };
-        if (editMessageBody.photo) {
-            editMessageRequestBody.photo = editMessageBody.photo;
-        }
-        if (editMessageBody.replyMarkup) {
-            editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
-        }
-        return await axiosInstance
-            .post(`/editMessageCaption`, editMessageRequestBody)
-            .then((response) => response.data);
-    }
-
+class DialogWithUser extends BasicMessageActions {
     public async sendErrorMessageToUser(chatId: number): Promise<SendMessageResponse> {
         const newMessage = {
             chat_id: chatId,
@@ -126,14 +65,10 @@ class DialogWithUser {
             .then((response) => response.data);
     }
 
-    public async deleteMessage(chatId: number, messageId: number): Promise<DeleteMessageResponse> {
-        const deleteMessageParameter = {
-            chat_id: chatId,
-            message_id: messageId,
-        };
-        return await axiosInstance
-            .post<DeleteMessageResponse>(`/deleteMessage`, deleteMessageParameter)
-            .then((response) => response.data);
+    public async sendMessageToMe(messageText: string): Promise<SendMessageResponse | void> {
+        if (process.env.MY_CHAT_ID) {
+            return this.sendMessageToUser(Number(process.env.MY_CHAT_ID), messageText);
+        }
     }
 }
 

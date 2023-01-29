@@ -1,6 +1,7 @@
 import fs from "fs";
 import ytdl from "ytdl-core";
-import DialogWithUser, { EditMessageBody } from "../../DialogWithUser";
+import DialogWithUser from "../../DialogWithUser";
+import { EditMessageBody } from "../../DialogWithUser/Types";
 import { MessageBody, createTitleAndFileName } from "../../messages/utils";
 import { GetFolderTotalSize, SizesEnum } from "../../tools/GetFolderTotalSize";
 
@@ -20,11 +21,11 @@ export class Tools {
 
     public async startDownload(itag: number): Promise<DownloadReturnType> {
         const videoInfo = await ytdl.getInfo(this.sourceLink);
+        const format = ytdl.chooseFormat(videoInfo.formats, {
+            quality: itag,
+        });
+        const [newMessageWithLink, fileName, link] = createTitleAndFileName(videoInfo);
         return new Promise<DownloadReturnType>((resolve, reject) => {
-            const [newMessageWithLink, fileName, link] = createTitleAndFileName(videoInfo);
-            const format = ytdl.chooseFormat(videoInfo.formats, {
-                quality: itag,
-            });
             ytdl(this.sourceLink, { format })
                 .pipe(fs.createWriteStream(`downloads/${fileName}.mp4`))
                 .on("finish", () => {
@@ -61,7 +62,7 @@ export class Tools {
         if (folderSize.total.includes(SizesEnum.KB)) return true;
         if (
             folderSize.total.includes(SizesEnum.MB) &&
-            Number(folderSize.total.split(" ")[0]) >= 300
+            Number(folderSize.total.split(" ")[0]) >= 250
         ) {
             return false;
         } else {
