@@ -44,20 +44,26 @@ class YoutubeDownloader extends Tools {
         itag: number,
         messageId: number
     ): Promise<SendMessageResponse> {
-        const { newMessageWithLink, link } = await this.startDownload(itag);
+        try {
+            const { newMessageWithLink, link } = await this.startDownload(itag);
 
-        const editMessageBody: EditMessageBody = {
-            chatId: this.chatId,
-            messageId,
-            caption: newMessageWithLink.text,
-        };
-        await DialogWithUser.editMessageCaption(editMessageBody);
-
-        const messageWithVideo = {
-            chatId: this.chatId,
-            video: link,
-        };
-        return await DialogWithUser.sendVideoToUser(this.chatId, messageWithVideo);
+            const editMessageBody: EditMessageBody = {
+                chatId: this.chatId,
+                messageId,
+                caption: newMessageWithLink.text,
+            };
+            await DialogWithUser.editMessageCaption(editMessageBody);
+            const messageWithVideo = {
+                chatId: this.chatId,
+                video: link,
+            };
+            return await DialogWithUser.sendVideoToUser(this.chatId, messageWithVideo);
+        } catch (error) {
+            console.log(
+                `[server]: An error has occurred while video download ${JSON.stringify(error)}`
+            );
+            return await DialogWithUser.sendErrorMessageToUser(this.chatId);
+        }
     }
 }
 

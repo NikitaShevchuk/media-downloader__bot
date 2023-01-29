@@ -39,6 +39,7 @@ class DialogWithUser extends BasicMessageActions {
         chatId: number,
         body: MessageBodyWithVideo
     ): Promise<SendMessageResponse> {
+        this.sendAction(chatId, "upload_video");
         const newMessage: MessageRequestBodyWithVideo = {
             chat_id: chatId,
             video: body.video,

@@ -46,4 +46,14 @@ export class BasicMessageActions {
             .post<DeleteMessageResponse>(`/deleteMessage`, deleteMessageParameter)
             .then((response) => response.data);
     }
+
+    public async sendAction(chatId: number, action: string): Promise<SendMessageResponse> {
+        const actionMessage = {
+            chat_id: chatId,
+            action,
+        };
+        return await axiosInstance
+            .post<SendMessageResponse>(`/sendChatAction`, actionMessage)
+            .then((response) => response.data);
+    }
 }
