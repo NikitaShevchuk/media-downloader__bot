@@ -1,9 +1,7 @@
 import fs from "fs";
 import ytdl from "ytdl-core";
-import DialogWithUser from "../../DialogWithUser";
 import { EditMessageBody } from "../../DialogWithUser/Types";
 import { MessageBody, createTitleAndFileName } from "../../messages/utils";
-import { GetFolderTotalSize, SizesEnum } from "../../tools/GetFolderTotalSize";
 
 interface DownloadReturnType {
     newMessageWithLink: MessageBody;
@@ -46,27 +44,5 @@ export class Tools {
                 inline_keyboard: [[{ text: "Downloading video...", callback_data: "downloading" }]],
             },
         };
-    }
-
-    public checkAvailableStorage(): boolean {
-        const folderSize = new GetFolderTotalSize("./downloads");
-        if (process.env.MY_CHAT_ID) {
-            DialogWithUser.sendMessageToUser(
-                Number(process.env.MY_CHAT_ID),
-                `[server storage]: ${folderSize.total}`
-            );
-        }
-        console.log(`[server]: Total server space used: ${folderSize.total}`);
-        if (folderSize.total.includes(SizesEnum.TB)) return false;
-        if (folderSize.total.includes(SizesEnum.GB)) return false;
-        if (folderSize.total.includes(SizesEnum.KB)) return true;
-        if (
-            folderSize.total.includes(SizesEnum.MB) &&
-            Number(folderSize.total.split(" ")[0]) >= 250
-        ) {
-            return false;
-        } else {
-            return true;
-        }
     }
 }

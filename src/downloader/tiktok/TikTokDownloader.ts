@@ -3,6 +3,7 @@ import fs from "fs";
 import internal from "stream";
 import DialogWithUser from "../../DialogWithUser";
 import { MessageBodyWithVideo } from "../../messages/Types";
+import { AvailableStorage } from "../../tools/CheckAvailableStorage";
 
 interface FileName {
     fileName: string;
@@ -18,6 +19,7 @@ export class TikTokDownloader {
     }
 
     public async download() {
+        if (!this.checkStorage()) return;
         try {
             const video = await this.getVideoStream();
             const { fileName } = await this.pipeVideoStream(video);
@@ -51,8 +53,20 @@ export class TikTokDownloader {
                     resolve({ fileName });
                 })
                 .on("error", (error) => {
+                    reject(error);
                     console.log(error);
                 });
         });
+    }
+
+    private async checkStorage() {
+        const storage = new AvailableStorage("./downloads");
+        if (storage.checkAvailableStorage()) {
+            return true;
+        } else {
+            DialogWithUser.sendMessageToMe("Server storage is full!");
+            await DialogWithUser.sendMessageToUser(this.chatId, "Server storage is full");
+            return false;
+        }
     }
 }
