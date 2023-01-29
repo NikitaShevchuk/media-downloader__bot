@@ -1,8 +1,6 @@
 import axios from "axios";
 import DialogWithUser from "../../DialogWithUser";
 import { MessageBodyWithVideo } from "../../messages/Types";
-import Cheerio from "cheerio";
-import { getOptions } from "./getOptions";
 
 export class TikTokDownloader {
     private sourceLink: string;
@@ -15,21 +13,20 @@ export class TikTokDownloader {
 
     public async download() {
         try {
-            // const data = { id: this.sourceLink };
-            const response = await axios.get(
-                `https://dlpanda.com/en?url=${encodeURIComponent(this.sourceLink || "")}`
-            );
-            const selector = Cheerio.load(response.data);
+            const data = { url: this.sourceLink };
+            const response = await axios.post(`https://downloader.bot/api/tiktok/info`, data);
+            // const selector = Cheerio.load(response.data);
             // const videoUrl = selector("a[type=no-watermark]").attr("href");
-            const videoUrl = selector("source").attr("src");
+            const videoUrl = response.data.data.mp4;
+            console.log(videoUrl);
             const messageBody: MessageBodyWithVideo = {
                 video: videoUrl || "",
                 caption: videoUrl,
             };
-            DialogWithUser.sendVideoToUser(this.chatId, messageBody);
-        } catch (error) {
+            // if (videoUrl) DialogWithUser.sendVideoToUser(this.chatId, messageBody);
+        } catch (error: any) {
             DialogWithUser.sendErrorMessageToUser(this.chatId);
-            console.log(error);
+            console.log(error.response.data);
         }
     }
 }
