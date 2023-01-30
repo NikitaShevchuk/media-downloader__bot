@@ -1,9 +1,9 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application } from "express";
-import messagesRoute from "./messages/messages.route";
 import path from "path";
 import downloadRoute from "./download/download-route";
+import messagesRoute from "./messages/messages.route";
 
 export const downloadsPath = path.join(__dirname, "../../downloads");
 
@@ -33,6 +33,9 @@ class ExpressServer {
     }
 
     routes() {
+        this.app.use("/", (_, response: express.Response) =>
+            response.status(200).json("Server is running 👍")
+        );
         this.app.use(this.paths.message, messagesRoute);
         this.app.use(this.paths.download, downloadRoute);
     }
