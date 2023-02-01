@@ -1,6 +1,6 @@
 import { axiosInstance } from ".";
 import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
-import { NewMessage, EditMessageBody, EditMessageRequestBody } from "./Types";
+import { EditMessageBody, EditMessageRequestBody, NewMessage } from "./Types";
 
 export class BasicMessageActions {
     public async sendMessageToUser(
@@ -21,20 +21,45 @@ export class BasicMessageActions {
     public async editMessageCaption(
         editMessageBody: EditMessageBody
     ): Promise<SendMessageResponse> {
-        const editMessageRequestBody: EditMessageRequestBody = {
-            chat_id: editMessageBody.chatId,
-            message_id: editMessageBody.messageId,
-            caption: editMessageBody.caption,
-        };
-        if (editMessageBody.photo) {
-            editMessageRequestBody.photo = editMessageBody.photo;
+        try {
+            const editMessageRequestBody: EditMessageRequestBody = {
+                chat_id: editMessageBody.chatId,
+                message_id: editMessageBody.messageId,
+                caption: editMessageBody.caption,
+            };
+            if (editMessageBody.photo) {
+                editMessageRequestBody.photo = editMessageBody.photo;
+            }
+            if (editMessageBody.replyMarkup) {
+                editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
+            }
+            return await axiosInstance
+                .post(`/editMessageCaption`, editMessageRequestBody)
+                .then((response) => response.data);
+        } catch (error) {
+            console.log(error);
+            const response: SendMessageResponse = {
+                ok: false,
+                result: {
+                    message_id: editMessageBody.messageId,
+                    chat: {
+                        id: 1,
+                        type: "private",
+                        username: "admin",
+                        first_name: "",
+                        last_name: "",
+                    },
+                    date: 1,
+                    from: {
+                        first_name: "",
+                        id: 1,
+                        is_bot: false,
+                    },
+                    text: "text",
+                },
+            };
+            return response;
         }
-        if (editMessageBody.replyMarkup) {
-            editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
-        }
-        return await axiosInstance
-            .post(`/editMessageCaption`, editMessageRequestBody)
-            .then((response) => response.data);
     }
 
     public async deleteMessage(chatId: number, messageId: number): Promise<DeleteMessageResponse> {

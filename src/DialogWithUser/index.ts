@@ -44,7 +44,7 @@ class DialogWithUser extends BasicMessageActions {
             chat_id: chatId,
             video: body.video,
         };
-        if (body.caption) newMessage.caption = body.caption;
+        if (body.caption && body.caption.length < 1020) newMessage.caption = body.caption;
         return await axiosInstance
             .post<SendMessageResponse>(`/sendVideo`, newMessage)
             .then((response) => response.data);

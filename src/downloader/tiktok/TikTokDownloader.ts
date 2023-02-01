@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import fs from "fs";
 import internal from "stream";
 import DialogWithUser from "../../DialogWithUser";
@@ -7,6 +7,11 @@ import { AvailableStorage } from "../../tools/CheckAvailableStorage";
 
 interface FileName {
     fileName: string;
+}
+
+interface VideoStreamReturnType {
+    video: internal.Readable;
+    videoUrl: string;
 }
 
 export class TikTokDownloader {
@@ -21,12 +26,12 @@ export class TikTokDownloader {
     public async download() {
         if (!this.checkStorage()) return;
         try {
-            const video = await this.getVideoStream();
+            const { video, videoUrl } = await this.getVideoStream();
             const { fileName } = await this.pipeVideoStream(video);
             const videoPath = `${process.env.HOST || "http://localhost:80"}/download/${fileName}`;
             const messageBody: MessageBodyWithVideo = {
                 video: videoPath || "",
-                caption: videoPath,
+                caption: videoUrl,
             };
             if (videoPath) DialogWithUser.sendVideoToUser(this.chatId, messageBody);
         } catch (error: any) {
@@ -35,13 +40,14 @@ export class TikTokDownloader {
         }
     }
 
-    private async getVideoStream(): Promise<internal.Readable> {
+    private async getVideoStream(): Promise<VideoStreamReturnType> {
         const data = { url: this.sourceLink };
         const response = await axios.post(`https://downloader.bot/api/tiktok/info`, data);
         const videoUrl = response.data?.data.mp4;
-        return axios
+        const video = await axios
             .get<internal.Readable>(videoUrl, { responseType: "stream" })
             .then((response) => response.data);
+        return { video, videoUrl };
     }
 
     private async pipeVideoStream(video: internal.Readable): Promise<FileName> {

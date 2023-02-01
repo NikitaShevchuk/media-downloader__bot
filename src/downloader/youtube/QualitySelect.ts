@@ -16,13 +16,18 @@ export class QualitySelect {
     public async sendQualitySelectToUser(
         notificationMessageId: number
     ): Promise<SendMessageResponse> {
-        this.notificationMessageId = notificationMessageId;
-        const qualitySelectMessageBody = this.createQualitySelectMessage();
-        DialogWithUser.deleteMessage(this.chatId, this.notificationMessageId);
-        return await DialogWithUser.sendPhotoWithButtonsToUser(
-            this.chatId,
-            qualitySelectMessageBody
-        );
+        try {
+            this.notificationMessageId = notificationMessageId;
+            const qualitySelectMessageBody = this.createQualitySelectMessage();
+            DialogWithUser.deleteMessage(this.chatId, this.notificationMessageId);
+            return await DialogWithUser.sendPhotoWithButtonsToUser(
+                this.chatId,
+                qualitySelectMessageBody
+            );
+        } catch (error) {
+            console.error(error);
+            return await DialogWithUser.sendErrorMessageToUser(this.chatId);
+        }
     }
 
     private createQualitySelectMessage(): MessageBodyWithPhoto {
