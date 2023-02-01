@@ -33,6 +33,9 @@ class ExpressServer {
     }
 
     routes() {
+        this.app.use("", (request: express.Request, response: express.Response) => {
+            response.status(200).json("Server is running 👍");
+        });
         this.app.use(this.paths.message, messagesRoute);
         this.app.use(this.paths.download, downloadRoute);
     }
