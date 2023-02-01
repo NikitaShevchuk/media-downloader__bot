@@ -31,10 +31,12 @@ export class QualitySelect {
     }
 
     private createQualitySelectMessage(): MessageBodyWithPhoto {
-        const videoThumbnail = this.videoInfo.videoDetails.thumbnails[4].url;
+        const videoThumbnail = this.videoInfo?.videoDetails?.thumbnails[4]?.url
+            ? this.videoInfo?.videoDetails?.thumbnails[4]?.url
+            : this.videoInfo?.videoDetails?.thumbnails[0]?.url;
         const formatButtons = this.createFormatButtonsArray();
         const newMessage = {
-            photo: videoThumbnail,
+            photo: videoThumbnail || "",
             caption: `${this.videoInfo.videoDetails.title}\n\n` + `Select video quality:`,
             formatButtons,
         };
