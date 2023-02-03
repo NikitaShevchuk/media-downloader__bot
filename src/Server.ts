@@ -6,6 +6,7 @@ import downloadRoute from "./download/download-route";
 import messagesRoute from "./messages/messages.route";
 
 export const downloadsPath = path.join(__dirname, "../../downloads");
+export const buildPath = path.join(__dirname, "../../build");
 
 class ExpressServer {
     private app: Application;
@@ -30,6 +31,7 @@ class ExpressServer {
         this.app.use(bodyParser.json());
         this.app.use(cors());
         this.app.use(express.static(downloadsPath));
+        this.app.use(express.static(buildPath));
     }
 
     routes() {
