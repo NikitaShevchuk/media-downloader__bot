@@ -32,6 +32,10 @@ class ExpressServer {
         this.app.use(cors());
         this.app.use(express.static(downloadsPath));
         this.app.use(express.static(buildPath));
+        this.app.use(express.static(`${buildPath}/static`));
+        this.app.use(express.static(`${buildPath}/static/js`));
+        this.app.use(express.static(`${buildPath}/static/css`));
+        this.app.use(express.static(`${buildPath}/static/media`));
     }
 
     routes() {
