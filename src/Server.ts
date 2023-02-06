@@ -28,6 +28,7 @@ class ExpressServer {
         this.middlewares();
         this.routes();
         this.databaseLink = process.env.DATABASE_CONNECTION_LINK as string;
+        this.connectToDatabase();
     }
 
     middlewares() {

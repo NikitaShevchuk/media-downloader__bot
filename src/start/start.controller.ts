@@ -11,8 +11,8 @@ class StartController {
             response.status(200).json({});
             return;
         }
-        DialogWithUser.sendMessageToUser(request.body.message.chat.id, startText, true);
-        DialogWithUser.sendMessageToUser(request.body.message.chat.id, movieInstructionBody, true);
+        await DialogWithUser.sendMessageToUser(request.body.message.chat.id, startText, true);
+        DialogWithUser.sendMessageToUser(request.body.message.chat.id, movieInstructionBody);
         response.status(200).json({});
     }
 }
