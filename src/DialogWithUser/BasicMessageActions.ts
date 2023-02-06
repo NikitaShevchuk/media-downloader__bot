@@ -1,6 +1,8 @@
 import { axiosInstance } from ".";
 import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
 import { EditMessageBody, EditMessageRequestBody, NewMessage } from "./Types";
+import { getCommandsList } from "./commandsList";
+import { getReseponse } from "./getResponse";
 
 export class BasicMessageActions {
     public async sendMessageToUser(
@@ -38,27 +40,7 @@ export class BasicMessageActions {
                 .then((response) => response.data);
         } catch (error) {
             console.log(error);
-            const response: SendMessageResponse = {
-                ok: false,
-                result: {
-                    message_id: editMessageBody.messageId,
-                    chat: {
-                        id: 1,
-                        type: "private",
-                        username: "admin",
-                        first_name: "",
-                        last_name: "",
-                    },
-                    date: 1,
-                    from: {
-                        first_name: "",
-                        id: 1,
-                        is_bot: false,
-                    },
-                    text: "text",
-                },
-            };
-            return response;
+            return getReseponse(editMessageBody.messageId);
         }
     }
 
@@ -79,6 +61,16 @@ export class BasicMessageActions {
         };
         return await axiosInstance
             .post<SendMessageResponse>(`/sendChatAction`, actionMessage)
+            .then((response) => response.data);
+    }
+
+    public async setChatMenuButton(chatId: number): Promise<SendMessageResponse> {
+        const setMyCommands = {
+            chat_id: chatId,
+            menu_button: {type: "commands"}
+        };
+        return await axiosInstance
+            .post<SendMessageResponse>(`/setChatMenuButton`, setMyCommands)
             .then((response) => response.data);
     }
 }

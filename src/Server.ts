@@ -4,27 +4,30 @@ import express, { Application } from "express";
 import path from "path";
 import downloadRoute from "./download/download-route";
 import messagesRoute from "./messages/messages.route";
+import * as mongoose from "mongoose";
 
 export const downloadsPath = path.join(__dirname, "../../downloads");
 export const buildPath = path.join(__dirname, "../../build");
 
 class ExpressServer {
     private app: Application;
-    readonly port: number;
+    private readonly port: number;
     private paths: {
         message: string;
         download: string;
     };
+    private readonly databaseLink: string;
 
     constructor() {
         this.app = express();
         this.port = (process.env.PORT as unknown as number) || 8000;
         this.paths = {
             message: "",
-            download: "/download",
+            download: "/download"
         };
         this.middlewares();
         this.routes();
+        this.databaseLink = process.env.DATABASE_CONNECTION_LINK as string;
     }
 
     middlewares() {
@@ -38,6 +41,12 @@ class ExpressServer {
         this.app.use(express.static(`${buildPath}/static/media`));
     }
 
+    private connectToDatabase() {
+        mongoose.connect(this.databaseLink, {}, (error) => {
+            if (!error) console.log("[server]: Connected to database");
+            console.log(`[server]: Database errors: ${error ? error : "0 errors"}`);
+        });
+    }
     routes() {
         this.app.use(this.paths.message, messagesRoute);
         this.app.use(this.paths.download, downloadRoute);

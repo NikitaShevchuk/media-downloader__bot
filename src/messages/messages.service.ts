@@ -6,10 +6,8 @@ import FilterMessage from "./FilterMessage";
 
 class MessagesService {
     public async receiveMessage(request: NewMessageRequest): Promise<void> {
-        if (!request.message) {
-            this.receiveCallback(request.callback_query);
-            return;
-        }
+        if (!request.message) return;
+
         const chatId = request.message.chat.id;
         const sendMessageResponse = await DialogWithUser.sendMessageToUser(
             chatId,
@@ -31,7 +29,7 @@ class MessagesService {
         );
     }
 
-    private async receiveCallback(callbackMessage: CallbackQuery | undefined): Promise<void> {
+    public async receiveCallback(callbackMessage: CallbackQuery | undefined): Promise<void> {
         if (!callbackMessage || !callbackMessage.data) return;
         const [itag, sourceLink] = callbackMessage.data.split(" ");
         const downloader = new YoutubeDownloader(sourceLink, callbackMessage.message.chat.id);
