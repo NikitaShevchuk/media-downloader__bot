@@ -1,10 +1,10 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application } from "express";
+import * as mongoose from "mongoose";
 import path from "path";
 import downloadRoute from "./download/download-route";
 import messagesRoute from "./messages/messages.route";
-import * as mongoose from "mongoose";
 
 export const downloadsPath = path.join(__dirname, "../../downloads");
 export const buildPath = path.join(__dirname, "../../build");
@@ -43,6 +43,7 @@ class ExpressServer {
     }
 
     private connectToDatabase() {
+        mongoose.set("strictQuery", true);
         mongoose.connect(this.databaseLink, {}, (error) => {
             if (!error) console.log("[server]: Connected to database");
             console.log(`[server]: Database errors: ${error ? error : "0 errors"}`);

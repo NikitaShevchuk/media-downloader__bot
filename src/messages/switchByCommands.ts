@@ -1,7 +1,7 @@
 import express from "express";
-import StartController from "../start/start.controller";
 import { Message, NewMessageRequest } from "../Types/Message";
 import MoviesService from "../movies/movies.service";
+import StartController from "../start/start.controller";
 
 interface ReturnType {
     includesCommand: boolean;
@@ -17,6 +17,18 @@ export const switchByCommands = (
 
     if (messageBody?.includes("/addMovie")) {
         MoviesService.addNewMovie(chat.id, messageBody);
+        response.status(200).json({});
+        return includes;
+    }
+
+    if (messageBody?.includes("/findMovieByName")) {
+        MoviesService.getMovieByName(chat.id, messageBody.replace("/findMovieByName ", ""));
+        response.status(200).json({});
+        return includes;
+    }
+
+    if (messageBody?.includes("/getAllMovies")) {
+        MoviesService.getAllMovies(chat.id);
         response.status(200).json({});
         return includes;
     }
