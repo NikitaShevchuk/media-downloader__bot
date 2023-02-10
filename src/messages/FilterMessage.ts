@@ -7,10 +7,8 @@ class FilterMessage {
         if (messageText.includes("https://youtu.be/")) {
             messageText = this.replaceMobileLink(messageText);
         }
-        if (messageText.includes(" "))
-            this.filterLinks(messageText, " ", linksArray);
-        if (messageText.includes("\n"))
-            this.filterLinks(messageText, "\n", linksArray);
+        if (messageText.includes(" ")) this.filterLinks(messageText, " ", linksArray);
+        if (messageText.includes("\n")) this.filterLinks(messageText, "\n", linksArray);
         if (
             messageText.includes("https://") &&
             !messageText.includes(" ") &&
@@ -22,19 +20,11 @@ class FilterMessage {
     }
 
     private replaceMobileLink(messageText: string): string {
-        return messageText.replace(
-            "https://youtu.be/",
-            "https://www.youtube.com/watch?v="
-        );
+        return messageText.replace("https://youtu.be/", "https://www.youtube.com/watch?v=");
     }
-    private filterLinks(
-        messageText: string,
-        splitBy: string,
-        linksArray: string[]
-    ) {
+    private filterLinks(messageText: string, splitBy: string, linksArray: string[]) {
         messageText.split(splitBy).forEach((wordInMessage) => {
-            if (wordInMessage.includes("https://"))
-                linksArray.push(wordInMessage);
+            if (wordInMessage.includes("https://")) linksArray.push(wordInMessage);
         });
     }
 }
