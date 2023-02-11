@@ -4,7 +4,7 @@ import { apiToken, baseApiUrl } from "../api-connection";
 import {
     MessageBodyWithPhoto,
     MessageBodyWithVideo,
-    MessageRequestBodyWithVideo,
+    MessageRequestBodyWithVideo
 } from "../messages/Types";
 import { BasicMessageActions } from "./BasicMessageActions";
 
@@ -14,7 +14,7 @@ class DialogWithUser extends BasicMessageActions {
     public async sendErrorMessageToUser(chatId: number): Promise<SendMessageResponse> {
         const newMessage = {
             chat_id: chatId,
-            text: "Something went wrong :(",
+            text: "Something went wrong :("
         };
         return await axiosInstance
             .post<SendMessageResponse>(`/sendMessage`, newMessage)
@@ -28,7 +28,7 @@ class DialogWithUser extends BasicMessageActions {
         const newMessage = {
             chat_id: chatId,
             photo: body.photo,
-            caption: body.caption,
+            caption: body.caption
         };
         return await axiosInstance
             .post<SendMessageResponse>(`/sendPhoto`, newMessage)
@@ -42,7 +42,7 @@ class DialogWithUser extends BasicMessageActions {
         this.sendAction(chatId, "upload_video");
         const newMessage: MessageRequestBodyWithVideo = {
             chat_id: chatId,
-            video: body.video,
+            video: body.video
         };
         if (body.caption && body.caption.length < 1020) newMessage.caption = body.caption;
         return await axiosInstance
@@ -59,14 +59,14 @@ class DialogWithUser extends BasicMessageActions {
             photo: body.photo,
             caption: body.caption,
             resize_keyboard: true,
-            reply_markup: { inline_keyboard: body.formatButtons },
+            reply_markup: { inline_keyboard: body.formatButtons }
         };
         return await axiosInstance
             .post<SendMessageResponse>(`/sendPhoto`, newMessage)
             .then((response) => response.data);
     }
 
-    public async sendMessageToMe(messageText: string): Promise<SendMessageResponse | void> {
+    public async forwardMessageToMe(messageText: string): Promise<SendMessageResponse | void> {
         if (process.env.MY_CHAT_ID) {
             return this.sendMessageToUser(Number(process.env.MY_CHAT_ID), messageText);
         }

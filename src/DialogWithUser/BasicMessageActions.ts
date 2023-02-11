@@ -1,7 +1,7 @@
 import { axiosInstance } from ".";
-import { DeleteMessageResponse, SendMessageResponse } from "../Types/SendMessageResponse";
+import { SendMessageResponse } from "../Types/SendMessageResponse";
+import { getResponse } from "./getResponse";
 import { EditMessageBody, EditMessageRequestBody, NewMessage } from "./Types";
-import { getReseponse } from "./getResponse";
 
 export class BasicMessageActions {
     public async sendMessageToUser(
@@ -10,66 +10,56 @@ export class BasicMessageActions {
         removeLinkPreview?: boolean
     ): Promise<SendMessageResponse> {
         const newMessage: NewMessage = {
-            chat_id: chatId,
             text: body
         };
         if (removeLinkPreview) newMessage.disable_web_page_preview = removeLinkPreview;
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendMessage`, newMessage)
-            .then((response) => response.data);
+        return await this.requestTelegramApi(`/sendMessage`, chatId, newMessage);
     }
 
     public async editMessageCaption(
         editMessageBody: EditMessageBody
     ): Promise<SendMessageResponse> {
-        try {
-            const editMessageRequestBody: EditMessageRequestBody = {
-                chat_id: editMessageBody.chatId,
-                message_id: editMessageBody.messageId,
-                caption: editMessageBody.caption
-            };
-            if (editMessageBody.photo) {
-                editMessageRequestBody.photo = editMessageBody.photo;
-            }
-            if (editMessageBody.replyMarkup) {
-                editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
-            }
-            return await axiosInstance
-                .post(`/editMessageCaption`, editMessageRequestBody)
-                .then((response) => response.data);
-        } catch (error) {
-            console.log(error);
-            return getReseponse(editMessageBody.messageId);
+        const editMessageRequestBody: EditMessageRequestBody = {
+            message_id: editMessageBody.messageId,
+            caption: editMessageBody.caption
+        };
+        if (editMessageBody.photo) {
+            editMessageRequestBody.photo = editMessageBody.photo;
         }
+        if (editMessageBody.replyMarkup) {
+            editMessageRequestBody.reply_markup = editMessageBody.replyMarkup;
+        }
+        return this.requestTelegramApi(
+            `/editMessageCaption`,
+            editMessageBody.chatId,
+            editMessageRequestBody
+        );
     }
 
-    public async deleteMessage(chatId: number, messageId: number): Promise<DeleteMessageResponse> {
-        const deleteMessageParameter = {
-            chat_id: chatId,
+    public async deleteMessage(chatId: number, messageId: number): Promise<SendMessageResponse> {
+        return await this.requestTelegramApi(`/deleteMessage`, chatId, {
             message_id: messageId
-        };
-        return await axiosInstance
-            .post<DeleteMessageResponse>(`/deleteMessage`, deleteMessageParameter)
-            .then((response) => response.data);
+        });
     }
 
     public async sendAction(chatId: number, action: string): Promise<SendMessageResponse> {
-        const actionMessage = {
-            chat_id: chatId,
-            action
-        };
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendChatAction`, actionMessage)
-            .then((response) => response.data);
+        return await this.requestTelegramApi(`/sendChatAction`, chatId, { action });
     }
 
     public async setChatMenuButton(chatId: number): Promise<SendMessageResponse> {
-        const setMyCommands = {
-            chat_id: chatId,
+        return await this.requestTelegramApi(`/setChatMenuButton`, chatId, {
             menu_button: { type: "commands" }
-        };
-        return await axiosInstance
-            .post<SendMessageResponse>(`/setChatMenuButton`, setMyCommands)
-            .then((response) => response.data);
+        });
+    }
+
+    private async requestTelegramApi(endpoint: string, chatId: number, payload: object) {
+        try {
+            return await axiosInstance
+                .post<SendMessageResponse>(endpoint, { chat_id: chatId, ...payload })
+                .then((response) => response.data);
+        } catch (error) {
+            console.log(error);
+            return getResponse();
+        }
     }
 }

@@ -4,7 +4,6 @@ import { EditMessageBody } from "../../DialogWithUser/Types";
 import { SendMessageResponse } from "../../Types/SendMessageResponse";
 import { QualitySelect } from "./QualitySelect";
 import { Tools } from "./Tools";
-import { AvailableStorage } from "../../tools/CheckAvailableStorage";
 
 class YoutubeDownloader extends Tools {
     public async sendVideoInfoToUser(notificationMessageId: number): Promise<SendMessageResponse> {
@@ -24,12 +23,6 @@ class YoutubeDownloader extends Tools {
         itag: number,
         messageId: number
     ): Promise<SendMessageResponse> {
-        const storage = new AvailableStorage("./downloads");
-        if (!storage.checkAvailableStorage()) {
-            DialogWithUser.sendMessageToMe("Server storage is full!");
-            return await DialogWithUser.sendMessageToUser(this.chatId, "Server storage is full");
-        }
-
         try {
             const messageWithLoadingState = this.createMessageWithLoadingState(messageId);
             DialogWithUser.editMessageCaption(messageWithLoadingState);
@@ -52,12 +45,12 @@ class YoutubeDownloader extends Tools {
             const editMessageBody: EditMessageBody = {
                 chatId: this.chatId,
                 messageId,
-                caption: newMessageWithLink.text,
+                caption: newMessageWithLink.text
             };
             await DialogWithUser.editMessageCaption(editMessageBody);
             const messageWithVideo = {
                 chatId: this.chatId,
-                video: link,
+                video: link
             };
             return await DialogWithUser.sendVideoToUser(this.chatId, messageWithVideo);
         } catch (error) {

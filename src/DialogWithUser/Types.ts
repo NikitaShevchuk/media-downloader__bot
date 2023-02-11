@@ -1,7 +1,6 @@
 import { FormatButton } from "../messages/Types/index";
 
 export interface NewMessage {
-    chat_id: number;
     text: string;
     disable_web_page_preview?: boolean;
 }
@@ -20,7 +19,6 @@ export interface EditMessageBody {
 }
 
 export interface EditMessageRequestBody {
-    chat_id: number;
     message_id: number;
     caption?: string;
     reply_markup?: ReplyMarkup;
