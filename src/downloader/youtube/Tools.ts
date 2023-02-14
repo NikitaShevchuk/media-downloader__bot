@@ -20,7 +20,7 @@ export class Tools {
     public async startDownload(itag: number): Promise<DownloadReturnType> {
         const videoInfo = await ytdl.getInfo(this.sourceLink);
         const format = ytdl.chooseFormat(videoInfo.formats, {
-            quality: itag,
+            quality: itag
         });
         const [newMessageWithLink, fileName, link] = createTitleAndFileName(videoInfo);
         return new Promise<DownloadReturnType>((resolve, reject) => {
@@ -41,8 +41,8 @@ export class Tools {
             messageId,
             replyMarkup: {
                 resize_keyboard: true,
-                inline_keyboard: [[{ text: "Downloading video...", callback_data: "downloading" }]],
-            },
+                inline_keyboard: [[{ text: "Downloading video...", callback_data: "downloading" }]]
+            }
         };
     }
 }

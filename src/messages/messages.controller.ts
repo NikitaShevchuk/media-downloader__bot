@@ -15,8 +15,7 @@ class MessagesController {
             if (request.body.message) {
                 if (!request.body.message.text) return response.status(200).json({});
 
-                const { includesCommand } = switchByCommands(request, response);
-                if (includesCommand) return;
+                if (switchByCommands(request, response)) return;
 
                 if (validateId(request.body.message.text)) {
                     MoviesService.getMovieByUniqueIdAndSendToUser(
@@ -26,13 +25,11 @@ class MessagesController {
                     return response.status(200).json({});
                 }
 
-                const newMessageResponse = await MessagesService.receiveMessage(request.body);
-                response.status(200).json(newMessageResponse);
+                await MessagesService.receiveMessage(request.body);
+                response.status(200).json({});
             } else if (request.body.callback_query) {
-                const newMessageResponse = await MessagesService.receiveCallback(
-                    request.body as CallbackQuery
-                );
-                response.status(200).json(newMessageResponse);
+                await MessagesService.receiveCallback(request.body.callback_query as CallbackQuery);
+                response.status(200).json({});
             } else {
                 return response.status(404).json({});
             }

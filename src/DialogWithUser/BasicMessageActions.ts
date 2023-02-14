@@ -52,7 +52,18 @@ export class BasicMessageActions {
         });
     }
 
-    private async requestTelegramApi(endpoint: string, chatId: number, payload: object) {
+    public async forwardMessage(
+        targetChatId: number,
+        fromChatId: number,
+        messageId: number
+    ): Promise<SendMessageResponse> {
+        return await this.requestTelegramApi(`/forwardMessage`, targetChatId, {
+            from_chat_id: fromChatId,
+            message_id: messageId
+        });
+    }
+
+    public async requestTelegramApi(endpoint: string, chatId: number, payload: object) {
         try {
             return await axiosInstance
                 .post<SendMessageResponse>(endpoint, { chat_id: chatId, ...payload })

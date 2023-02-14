@@ -12,13 +12,7 @@ export const axiosInstance = axios.create({ baseURL: `${baseApiUrl}${apiToken}` 
 
 class DialogWithUser extends BasicMessageActions {
     public async sendErrorMessageToUser(chatId: number): Promise<SendMessageResponse> {
-        const newMessage = {
-            chat_id: chatId,
-            text: "Something went wrong :("
-        };
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendMessage`, newMessage)
-            .then((response) => response.data);
+        return await this.sendMessageToUser(chatId, "Something went wrong :(");
     }
 
     public async sendPhotoToUser(
@@ -26,13 +20,10 @@ class DialogWithUser extends BasicMessageActions {
         body: MessageBodyWithPhoto
     ): Promise<SendMessageResponse> {
         const newMessage = {
-            chat_id: chatId,
             photo: body.photo,
             caption: body.caption
         };
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendPhoto`, newMessage)
-            .then((response) => response.data);
+        return await this.requestTelegramApi(`/sendPhoto`, chatId, newMessage);
     }
 
     public async sendVideoToUser(
@@ -55,20 +46,26 @@ class DialogWithUser extends BasicMessageActions {
         body: MessageBodyWithPhoto
     ): Promise<SendMessageResponse> {
         const newMessage = {
-            chat_id: chatId,
             photo: body.photo,
             caption: body.caption,
             resize_keyboard: true,
             reply_markup: { inline_keyboard: body.formatButtons }
         };
-        return await axiosInstance
-            .post<SendMessageResponse>(`/sendPhoto`, newMessage)
-            .then((response) => response.data);
+        return await this.requestTelegramApi(`/sendPhoto`, chatId, newMessage);
     }
 
-    public async forwardMessageToMe(messageText: string): Promise<SendMessageResponse | void> {
+    public async forwardMessageToMe(
+        chatId: number,
+        messageId: number
+    ): Promise<SendMessageResponse | void> {
         if (process.env.MY_CHAT_ID) {
-            return this.sendMessageToUser(Number(process.env.MY_CHAT_ID), messageText);
+            return this.forwardMessage(Number(process.env.MY_CHAT_ID), chatId, messageId);
+        }
+    }
+
+    public async sendMessageToMe(message: string): Promise<SendMessageResponse | void> {
+        if (process.env.MY_CHAT_ID) {
+            return this.sendMessageToUser(Number(process.env.MY_CHAT_ID), message);
         }
     }
 }

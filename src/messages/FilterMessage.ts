@@ -4,6 +4,7 @@ class FilterMessage {
         if (!messageText) return [""];
 
         const linksArray: string[] = [];
+
         if (messageText.includes("https://youtu.be/")) {
             messageText = this.replaceMobileLink(messageText);
         }

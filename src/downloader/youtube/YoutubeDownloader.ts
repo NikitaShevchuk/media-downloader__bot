@@ -1,64 +1,36 @@
 import ytdl from "ytdl-core";
 import DialogWithUser from "../../DialogWithUser";
 import { EditMessageBody } from "../../DialogWithUser/Types";
-import { SendMessageResponse } from "../../Types/SendMessageResponse";
 import { QualitySelect } from "./QualitySelect";
 import { Tools } from "./Tools";
 
 class YoutubeDownloader extends Tools {
-    public async sendVideoInfoToUser(notificationMessageId: number): Promise<SendMessageResponse> {
-        try {
-            const videoInfo = await ytdl.getInfo(this.sourceLink);
-            const qualitySelect = new QualitySelect(videoInfo, this.chatId);
-            return await qualitySelect.sendQualitySelectToUser(notificationMessageId);
-        } catch (error) {
-            console.log(
-                `[server]: error while sending info about a video to user: ${JSON.stringify(error)}`
-            );
-            return await DialogWithUser.sendErrorMessageToUser(this.chatId);
-        }
+    public async sendVideoInfoToUser(notificationMessageId: number) {
+        const videoInfo = await ytdl.getInfo(this.sourceLink);
+        const qualitySelect = new QualitySelect(videoInfo, this.chatId);
+        return await qualitySelect.sendQualitySelectToUser(notificationMessageId);
     }
 
-    public async downloadVideoByLink(
-        itag: number,
-        messageId: number
-    ): Promise<SendMessageResponse> {
-        try {
-            const messageWithLoadingState = this.createMessageWithLoadingState(messageId);
-            DialogWithUser.editMessageCaption(messageWithLoadingState);
-            return await this.downloadVideoAndNotifyUser(itag, messageId);
-        } catch (error) {
-            console.log(
-                `[server]: An error has occurred while video download ${JSON.stringify(error)}`
-            );
-            return await DialogWithUser.sendErrorMessageToUser(this.chatId);
-        }
+    public async downloadVideoByLink(itag: number, messageId: number) {
+        const messageWithLoadingState = this.createMessageWithLoadingState(messageId);
+        DialogWithUser.editMessageCaption(messageWithLoadingState);
+        return await this.downloadVideoAndNotifyUser(itag, messageId);
     }
 
-    private async downloadVideoAndNotifyUser(
-        itag: number,
-        messageId: number
-    ): Promise<SendMessageResponse> {
-        try {
-            const { newMessageWithLink, link } = await this.startDownload(itag);
+    private async downloadVideoAndNotifyUser(itag: number, messageId: number) {
+        const { newMessageWithLink, link } = await this.startDownload(itag);
 
-            const editMessageBody: EditMessageBody = {
-                chatId: this.chatId,
-                messageId,
-                caption: newMessageWithLink.text
-            };
-            await DialogWithUser.editMessageCaption(editMessageBody);
-            const messageWithVideo = {
-                chatId: this.chatId,
-                video: link
-            };
-            return await DialogWithUser.sendVideoToUser(this.chatId, messageWithVideo);
-        } catch (error) {
-            console.log(
-                `[server]: An error has occurred while video download ${JSON.stringify(error)}`
-            );
-            return await DialogWithUser.sendErrorMessageToUser(this.chatId);
-        }
+        const editMessageBody: EditMessageBody = {
+            chatId: this.chatId,
+            messageId,
+            caption: newMessageWithLink.text
+        };
+        await DialogWithUser.editMessageCaption(editMessageBody);
+        const messageWithVideo = {
+            chatId: this.chatId,
+            video: link
+        };
+        return await DialogWithUser.sendVideoToUser(this.chatId, messageWithVideo);
     }
 }
 
