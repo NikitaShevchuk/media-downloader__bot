@@ -31,7 +31,7 @@ export class TikTokDownloader {
             const videoPath = `${process.env.HOST || "http://localhost:80"}/download/${fileName}`;
             const messageBody: MessageBodyWithVideo = {
                 video: videoPath || "",
-                caption: videoUrl,
+                caption: videoUrl
             };
             if (videoPath) DialogWithUser.sendVideoToUser(this.chatId, messageBody);
         } catch (error: any) {

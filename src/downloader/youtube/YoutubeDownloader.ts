@@ -1,6 +1,7 @@
 import ytdl from "ytdl-core";
 import DialogWithUser from "../../DialogWithUser";
 import { EditMessageBody } from "../../DialogWithUser/Types";
+import { AvailableStorage } from "../../tools/CheckAvailableStorage";
 import { QualitySelect } from "./QualitySelect";
 import { Tools } from "./Tools";
 
@@ -12,6 +13,11 @@ class YoutubeDownloader extends Tools {
     }
 
     public async downloadVideoByLink(itag: number, messageId: number) {
+        const storage = new AvailableStorage("./downloads");
+        if (!storage.checkAvailableStorage()) {
+            return DialogWithUser.sendErrorMessageToUser(this.chatId);
+        }
+
         const messageWithLoadingState = this.createMessageWithLoadingState(messageId);
         DialogWithUser.editMessageCaption(messageWithLoadingState);
         return await this.downloadVideoAndNotifyUser(itag, messageId);

@@ -13,7 +13,7 @@ export class AvailableStorage extends GetFolderTotalSize {
         if (this.total.includes(SizesEnum.TB)) return false;
         if (this.total.includes(SizesEnum.GB)) return false;
         if (this.total.includes(SizesEnum.KB)) return true;
-        if (this.total.includes(SizesEnum.MB) && Number(this.total.split(" ")[0]) >= 250) {
+        if (this.total.includes(SizesEnum.MB) && Number(this.total.split(" ")[0]) >= 500) {
             return false;
         } else {
             return true;
