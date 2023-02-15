@@ -43,14 +43,7 @@ export interface MessageEntity {
 export interface Message {
     message_id: number;
     chat: Chat;
-    from: {
-        id: number;
-        is_bot: boolean;
-        first_name: string;
-        username: string;
-        language_code: string;
-        is_premium: boolean;
-    };
+    from: User;
     date: number;
     text?: string;
     entities?: MessageEntity[];

@@ -17,13 +17,16 @@ interface VideoStreamReturnType {
 export class TikTokDownloader {
     private sourceLink: string;
     private chatId: number;
+    private notificationMessageId: number;
 
-    constructor(sourceLink: string, chatId: number) {
+    constructor(sourceLink: string, chatId: number, notificationMessageId: number) {
         this.sourceLink = sourceLink;
         this.chatId = chatId;
+        this.notificationMessageId = notificationMessageId;
     }
 
     public async download() {
+        DialogWithUser.deleteMessage(this.chatId, this.notificationMessageId);
         if (!this.checkStorage()) return;
         try {
             const { video, videoUrl } = await this.getVideoStream();

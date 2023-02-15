@@ -15,7 +15,11 @@ export const getResponse = (): SendMessageResponse => ({
         from: {
             first_name: "",
             id: 1,
-            is_bot: false
+            is_bot: false,
+            language_code: "en",
+            last_name: "last name",
+            is_premium: false,
+            username: "username"
         },
         text: "text"
     }

@@ -19,7 +19,7 @@ class LinksArrayManager {
                 await downloader.download();
                 await downloader.sendLinkToUser();
             } else if (CheckByLinkSource.isTikTok(singleLink)) {
-                const downloader = new TikTokDownloader(singleLink, chatId);
+                const downloader = new TikTokDownloader(singleLink, chatId, notificationMessageId);
                 await downloader.download();
             } else {
                 DialogWithUser.deleteMessage(chatId, notificationMessageId);

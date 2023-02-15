@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 import DialogWithUser from "../DialogWithUser";
-import { movieInstructionBody } from "../start/start.controller";
+import { movieInstructionBody } from "../start/start.service";
 import MoviesHelper from "./movies.helper";
 import MoviesRepository from "./movies.repository";
 

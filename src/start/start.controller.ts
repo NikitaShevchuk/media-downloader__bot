@@ -1,18 +1,14 @@
-import DialogWithUser from "../DialogWithUser";
-import { startText } from "../constants/start-text";
 import express from "express";
-
-export const movieInstructionBody =
-    "Send me a movie code to get a trailer (3-digit code, example: 111)";
+import { NewMessageRequest } from "./../Types/Message";
+import StartService from "./start.service";
 
 class StartController {
-    async start(request: express.Request, response: express.Response) {
+    async start(request: express.Request<any, any, NewMessageRequest>, response: express.Response) {
         if (!request.body?.message) {
             response.status(200).json({});
             return;
         }
-        await DialogWithUser.sendMessageToUser(request.body.message.chat.id, startText, true);
-        DialogWithUser.sendMessageToUser(request.body.message.chat.id, movieInstructionBody);
+        StartService.start(request.body.message, request.body.message.from);
         response.status(200).json({});
     }
 }
