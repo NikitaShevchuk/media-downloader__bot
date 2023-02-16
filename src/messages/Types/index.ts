@@ -1,3 +1,6 @@
+import express from "express";
+import { NewMessageRequest } from "../../Types/Message";
+
 export interface CallbackData {
     videoLink: string;
     itag: number;
@@ -24,3 +27,6 @@ export interface MessageRequestBodyWithVideo {
     caption?: string;
     video: string;
 }
+
+export type ExpressRequest = express.Request<any, any, NewMessageRequest>;
+export type ExpressResponse = express.Response;

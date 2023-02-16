@@ -1,31 +1,29 @@
-import express from "express";
-import { CallbackQuery, NewMessageRequest } from "../Types/Message";
+import { CallbackQuery } from "../Types/Message";
 import MoviesService from "../movies/movies.service";
+import { Commands } from "./Commands";
+import { ExpressRequest, ExpressResponse } from "./Types";
 import MessagesService from "./messages.service";
-import { switchByCommands } from "./switchByCommands";
 
 const validateId = (text: string) => /^\d{3}$/.test(text);
 
 class MessagesController {
-    public async receiveMessage(
-        request: express.Request<any, any, NewMessageRequest>,
-        response: express.Response
-    ) {
+    public async receiveMessage(request: ExpressRequest, response: ExpressResponse) {
         try {
             if (request.body.message) {
                 if (!request.body.message.text) return response.status(200).json({});
 
-                if (switchByCommands(request, response)) return;
+                const commands = new Commands(request, response);
+                if (commands.messageIncludesCommand) return;
 
                 if (validateId(request.body.message.text)) {
-                    MoviesService.getMovieByUniqueIdAndSendToUser(
+                    MessagesService.receiveMovieId(
                         request.body.message.chat.id,
                         request.body.message.text
                     );
                     return response.status(200).json({});
                 }
 
-                await MessagesService.receiveMessage(request.body);
+                await MessagesService.receiveMessage(request.body.message);
                 response.status(200).json({});
             } else if (request.body.callback_query) {
                 await MessagesService.receiveCallback(request.body.callback_query as CallbackQuery);
