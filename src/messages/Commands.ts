@@ -1,24 +1,21 @@
+import { Message } from "../Types/Message";
 import MoviesService from "../movies/movies.service";
-import StartController from "../start/start.controller";
+import StartService from "../start/start.service";
 import { DevCommands } from "./DevCommands";
-import { ExpressRequest, ExpressResponse } from "./Types";
 import { commandsList } from "./constants/commands-list";
 
 export class Commands extends DevCommands {
     private includesCommand: boolean;
-    private request: ExpressRequest;
-    private response: ExpressResponse;
+    private message: Message;
 
-    constructor(request: ExpressRequest, response: ExpressResponse) {
-        super(request.body?.message?.text as string, request.body?.message?.chat.id || 1);
+    constructor(message: Message) {
+        super(message?.text as string, message?.chat.id || 1);
 
         this.includesCommand = false;
-        this.request = request;
-        this.response = response;
+        this.message = message;
 
         if (this.includesDevCommand) {
             this.includesCommand = true;
-            response.status(200).json({});
         } else {
             this.checkIfMessageIncludesCommand();
         }
@@ -26,11 +23,10 @@ export class Commands extends DevCommands {
 
     public checkIfMessageIncludesCommand() {
         if (this.messageBody === commandsList.start) {
-            StartController.start(this.request, this.response);
+            StartService.start(this.message);
             this.includesCommand = true;
         } else if (this.messageBody === commandsList.movie) {
             MoviesService.sendInstruction(this.chatId as number);
-            this.response.status(200).json({});
             this.includesCommand = true;
         }
     }

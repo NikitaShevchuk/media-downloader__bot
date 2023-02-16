@@ -8,10 +8,10 @@ export const movieInstructionBody =
     "Send me a movie code to get a trailer (3-digit code, example: 111)";
 
 class StartService {
-    public async start(message: Message, user: User) {
+    public async start(message: Message) {
         await DialogWithUser.sendMessageToUser(message.chat.id, startText, true);
         DialogWithUser.sendMessageToUser(message.chat.id, movieInstructionBody);
-        startRepository.addNewUserIfNotExists(user, message.date);
+        startRepository.addNewUserIfNotExists(message.from, message.date);
     }
 }
 
