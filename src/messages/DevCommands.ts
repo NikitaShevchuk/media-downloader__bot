@@ -1,4 +1,5 @@
 import MoviesService from "../movies/movies.service";
+import UsersService from "../users/users.service";
 import { devCommandsList } from "./constants/commands-list";
 
 export class DevCommands {
@@ -14,20 +15,20 @@ export class DevCommands {
     }
 
     private checkIfMessageIncludesDevCommand() {
+        this.hasDevCommand = true;
         if (this.messageBody?.includes(devCommandsList.addMovie)) {
-            MoviesService.addNewMovie(this.chatId, this.messageBody);
-            this.hasDevCommand = true;
-        }
-        if (this.messageBody?.includes(devCommandsList.findMovieByName)) {
-            MoviesService.getMovieByName(
+            MoviesService.addNew(this.chatId, this.messageBody);
+        } else if (this.messageBody?.includes(devCommandsList.findMovieByName)) {
+            MoviesService.getByName(
                 this.chatId,
                 this.messageBody.replace(devCommandsList.findMovieByName + " ", "")
             );
-            this.hasDevCommand = true;
-        }
-        if (this.messageBody?.includes(devCommandsList.getAllMovies)) {
-            MoviesService.getAllMovies(this.chatId);
-            this.hasDevCommand = true;
+        } else if (this.messageBody?.includes(devCommandsList.getAllMovies)) {
+            MoviesService.getAll(this.chatId);
+        } else if (this.messageBody?.includes(devCommandsList.getAllUsers)) {
+            UsersService.getAll(this.chatId);
+        } else {
+            this.hasDevCommand = false;
         }
     }
 

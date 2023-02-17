@@ -23,12 +23,13 @@ class MessagesService {
     public async receiveCallback(callbackMessage: CallbackQuery | undefined): Promise<void> {
         if (!callbackMessage || !callbackMessage.data) return;
         const [itag, sourceLink] = callbackMessage.data.split(" ");
+        if (!itag || !sourceLink) return;
         const downloader = new YoutubeDownloader(sourceLink, callbackMessage.message.chat.id);
         downloader.downloadVideoByLink(Number(itag), Number(callbackMessage.message.message_id));
     }
 
     private async processTheMovieId(chatId: number, messageBody: string) {
-        MoviesService.getMovieByUniqueIdAndSendToUser(chatId, messageBody);
+        MoviesService.getByUniqueIdAndSendToUser(chatId, messageBody);
     }
 
     private async processTheLink(message: Message) {

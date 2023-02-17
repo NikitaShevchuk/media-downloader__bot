@@ -1,7 +1,8 @@
 export const devCommandsList = {
     addMovie: "/addMovie",
     findMovieByName: "/findMovieByName",
-    getAllMovies: "/getAllMovies"
+    getAllMovies: "/getAllMovies",
+    getAllUsers: "/getAllUsers"
 };
 
 export const commandsList = {

@@ -1,4 +1,6 @@
 import DialogWithUser from "../DialogWithUser";
+import { checkIfUserIsAdmin } from "../tools/checkIfUserIsAdmin";
+import { notAdminError } from "./../constants/not-admin-error";
 import { NewMovie } from "./Types/NewMovie";
 
 class MoviesHelper {
@@ -20,18 +22,15 @@ class MoviesHelper {
     }
 
     public checkIfUserIsAdmin(chatId: number): boolean {
-        const adminsList = process.env.ADMINS_LIST;
-        const userIsAdmin = adminsList && adminsList.split(",").find((id) => id === String(chatId));
-
+        const userIsAdmin = checkIfUserIsAdmin(chatId);
         if (!userIsAdmin) {
-            const { name, trailerUrl } = this.getNotAdminError();
-            DialogWithUser.sendMessageToUser(chatId, `${name}\n\n${trailerUrl}`);
+            DialogWithUser.sendMessageToUser(chatId, notAdminError);
         }
 
         return !!userIsAdmin;
     }
 
-    public replyToUserWithUndifindeResult(chatId: number) {
+    public replyToUserWithUndefinedResult(chatId: number) {
         const { name, trailerUrl } = this.getErrorResult();
         return DialogWithUser.sendMessageToUser(chatId, `${name}\n\n${trailerUrl}`);
     }
@@ -40,13 +39,6 @@ class MoviesHelper {
         return {
             name: "Please enter a movie data in correct format, ",
             trailerUrl: "example: /addMovie Name, https://you.be/trailer"
-        };
-    }
-
-    private getNotAdminError() {
-        return {
-            name: "You don't have permission to perform this action",
-            trailerUrl: "Authorize as Administrator to add new movies"
         };
     }
 }

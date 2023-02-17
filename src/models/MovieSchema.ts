@@ -22,3 +22,4 @@ const MovieSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("MovieSchema", MovieSchema);
+export type MoviesSchemaType = typeof MovieSchema;

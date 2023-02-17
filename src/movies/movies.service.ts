@@ -1,31 +1,17 @@
-import { Document, Types } from "mongoose";
+import { InferSchemaType } from "mongoose";
 import DialogWithUser from "../DialogWithUser";
+import { MoviesSchemaType } from "../models/MovieSchema";
 import { movieInstructionBody } from "../start/start.service";
 import MoviesHelper from "./movies.helper";
 import MoviesRepository from "./movies.repository";
 
-type Movie = Document<
-    unknown,
-    any,
-    {
-        name: string;
-        trailerUrl: string;
-        uniqueId: number;
-    }
-> & {
-    name: string;
-    trailerUrl: string;
-    uniqueId: number;
-} & {
-    _id: Types.ObjectId;
-};
+type Movie = InferSchemaType<MoviesSchemaType>;
 
 class MoviesService {
-    public async getMovieByUniqueIdAndSendToUser(chatId: number, uniqueId: string) {
+    public async getByUniqueIdAndSendToUser(chatId: number, uniqueId: string) {
         try {
             const { name, trailerUrl } =
-                (await MoviesRepository.getMovieByUniqueId(uniqueId)) ||
-                this.getMovieNotFoundResult;
+                (await MoviesRepository.getByUniqueId(uniqueId)) || this.getMovieNotFoundResult;
 
             return await DialogWithUser.sendMessageToUser(chatId, `${name}\n\n${trailerUrl}`);
         } catch (error) {
@@ -38,15 +24,15 @@ class MoviesService {
     }
 
     // newMovieStaring example: "/addMovie Name https://you.be/trailer"
-    public async addNewMovie(chatId: number, newMovieString: string) {
+    public async addNew(chatId: number, newMovieString: string) {
         if (!MoviesHelper.checkIfUserIsAdmin(chatId)) return;
 
         const newMovie = MoviesHelper.getNewMovieInstanceOrUndefined(newMovieString);
-        if (!newMovie) return MoviesHelper.replyToUserWithUndifindeResult(chatId);
+        if (!newMovie) return MoviesHelper.replyToUserWithUndefinedResult(chatId);
 
         try {
             const { name, trailerUrl, uniqueId } =
-                (await MoviesRepository.addNewMovie(newMovie)) || MoviesHelper.getErrorResult();
+                (await MoviesRepository.addNew(newMovie)) || MoviesHelper.getErrorResult();
             return DialogWithUser.sendMessageToUser(
                 chatId,
                 `Successfully added new movie to database\n\nMovie unique code: ${uniqueId}\n\n${name}\n\n${trailerUrl}`
@@ -62,12 +48,12 @@ class MoviesService {
         }
     }
 
-    public async getMovieByName(chatId: number, movieName: string) {
+    public async getByName(chatId: number, movieName: string) {
         if (!MoviesHelper.checkIfUserIsAdmin(chatId)) return;
 
         try {
             const movies =
-                (await MoviesRepository.getMovieByName(movieName)) || this.getMovieNotFoundResult;
+                (await MoviesRepository.getByName(movieName)) || this.getMovieNotFoundResult;
             const responseToUser = await DialogWithUser.sendMessageToUser(
                 chatId,
                 `Found ${movies.length} movie by request: "${movieName}"`
@@ -90,16 +76,16 @@ class MoviesService {
         }
     }
 
-    public async getAllMovies(chatId: number) {
+    public async getAll(chatId: number) {
         if (!MoviesHelper.checkIfUserIsAdmin(chatId)) return;
 
         try {
-            const movies = (await MoviesRepository.getAllMovies()) || this.getMovieNotFoundResult;
+            const movies = (await MoviesRepository.getAll()) || this.getMovieNotFoundResult;
             const responseToUser = await DialogWithUser.sendMessageToUser(
                 chatId,
                 `${movies.length} movies total in database`
             );
-            this.sendMoviesToUserWithTimout(chatId, movies);
+            this.sendToUserWithTimeout(chatId, movies);
             return responseToUser;
         } catch (error) {
             console.log(error);
@@ -116,7 +102,7 @@ class MoviesService {
         return await DialogWithUser.sendMessageToUser(chatId, movieInstructionBody);
     }
 
-    private async sendMoviesToUserWithTimout(chatId: number, movies: Movie[]) {
+    private async sendToUserWithTimeout(chatId: number, movies: Movie[]) {
         movies.forEach(({ name, trailerUrl, uniqueId }, movieIndex) =>
             setTimeout(() => {
                 DialogWithUser.sendMessageToUser(
