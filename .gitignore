@@ -55,6 +55,8 @@ build/
 ### Vim ###
 *.sw[a-p]
 
+data
+
 ### WebStorm/IntelliJ ###
 /.idea
 modules.xml
