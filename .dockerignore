@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+node_modules
+README.md
+.git
+dist
+.vscode
+downloads
+.idea
+
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
