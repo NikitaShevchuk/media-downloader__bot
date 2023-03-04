@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=builder /app ./
 #container exposed network port number
 
-ENV PORT 3000
+ENV PORT 5000
 
 EXPOSE 5000
 #command to run within the container
