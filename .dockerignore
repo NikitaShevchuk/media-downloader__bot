@@ -8,6 +8,7 @@ dist
 downloads
 .idea
 
+data
 logs
 npm-debug.log*
 yarn-debug.log*
